@@ -78,7 +78,13 @@ if question:
             st.write(f"Generated answer: {answer}")
 
             # Extract the response part from the generated text
-            response = answer.split('Answer:')[-1].strip() if 'Answer:' in answer else answer
+            # Clean up and ensure we only get the current answer
+            if 'Answer:' in answer:
+                response = answer.split('Answer:')[-1].strip()
+            else:
+                response = answer
+
+            # Add the bot's answer to the history
             st.session_state.history.append(f"Bot: {response}")
         except Exception as e:
             st.error(f"Error generating response: {str(e)}")
@@ -87,11 +93,11 @@ if question:
 for message in st.session_state.history:
     if message.startswith("User:"):
         with st.container():
-            col1, col2 = st.columns([1, 6])  # Adjust the column widths as needed
+            col1, col2 = st.columns([1, 3])  # Adjust the column widths as needed
             with col2:
                 st.write(message)
     elif message.startswith("Bot:"):
         with st.container():
-            col1, col2 = st.columns([6, 1])  # Adjust the column widths as needed
+            col1, col2 = st.columns([3, 1])  # Adjust the column widths as needed
             with col1:
                 st.write(message)
