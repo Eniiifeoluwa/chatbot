@@ -47,7 +47,7 @@ except Exception as e:
     st.error(f"Error loading the model: {str(e)}")
     st.stop()
 
-st.title("Restaurant Chatbot")
+st.title("Chatbot - Project 3")
 
 # Initialize session state for conversation history
 if 'history' not in st.session_state:
@@ -71,7 +71,7 @@ if question:
 
         # Generate the bot's response
         try:
-            result = qa_pipeline(prompt, max_length=100, num_return_sequences=1)
+            result = qa_pipeline(prompt, max_length=150, num_return_sequences=1)
             answer = result[0]['generated_text'].strip()
             
             # Extract the answer part from the generated text
@@ -82,15 +82,6 @@ if question:
         except Exception as e:
             st.error(f"Error generating response: {str(e)}")
 
-# Display the conversation history with the correct alignment
+# Display the conversation history
 for message in st.session_state.history:
-    if message.startswith("User:"):
-        with st.container():
-            col1, col2 = st.columns([1, 3])  # Adjust the column widths as needed
-            with col2:
-                st.write(message)
-    elif message.startswith("Bot:"):
-        with st.container():
-            col1, col2 = st.columns([6, 1])  # Adjust the column widths as needed
-            with col1:
-                st.write(message)
+    st.write(message)
