@@ -5,16 +5,14 @@ import streamlit as st
 from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
 import torch
 
-# Define the URL for the zipped folder and paths
-model_zip_url = 'https://drive.google.com/uc?export=download&id=1-TBHbObeMZnEMu3qqL-PDUnfWLQRHQyB'
+model_zip_url = 'https://drive.google.com/file/d/1-U-oNTyHSmhnXVLk4l0seTFv0j-Ir2fT/view?usp=drive_link'
 zip_path = 'fine-tuned-gpt2.zip'
 model_dir = 'fine-tuned-gpt2'
 
-# Download the zipped folder if it hasn't been downloaded yet
+
 if not os.path.exists(zip_path):
     gdown.download(model_zip_url, zip_path, quiet=False)
 
-# Unzip the folder if it hasn't been unzipped yet
 if not os.path.exists(model_dir):
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(model_dir)
