@@ -53,12 +53,11 @@ st.title("Chatbot - Project 3")
 # File uploader for JSON file
 uploaded_file = st.file_uploader("Upload Food menu JSON file", type="json")
 
+menu_items = {}
+
 if uploaded_file:
     try:
         data = json.load(uploaded_file)
-
-        # Extract menu items and prices
-        menu_items = {}
         for category, items in data['restaurant']['menu'].items():
             for item in items:
                 menu_items[item['name'].lower()] = item.get('description', 'Description not available')
@@ -79,14 +78,14 @@ st.write("Ask me anything about our restaurant!")
 question = st.text_input("Your question:")
 
 if question:
-    # Handle greetings separately
-    if question.lower() in ["hi", "hello", "hey"]:
-        response = "Welcome! How can I help you today?"
-        st.session_state.history.append(f"Bot: {response}")
-    else:
-        # Add the user's question to the history
-        st.session_state.history.append(f"User: {question}")
+    # Add the user's question to the history
+    st.session_state.history.append(f"User: {question}")
 
+    # Check if the question is about a specific menu item
+    lower_question = question.lower().strip()
+    if lower_question in menu_items:
+        response = menu_items[lower_question]
+    else:
         # Create prompt with the most recent question
         prompt = f"Question: {question}\nAnswer:"
 
@@ -94,14 +93,14 @@ if question:
         try:
             result = qa_pipeline(prompt, max_length=150, num_return_sequences=1)
             answer = result[0]['generated_text'].strip()
-            
+
             # Extract the answer part from the generated text
             response = answer.split('Answer:')[-1].strip()
-            
-            # Add the bot's answer to the history
-            st.session_state.history.append(f"Bot: {response}")
         except Exception as e:
-            st.error(f"Error generating response: {str(e)}")
+            response = f"Error generating response: {str(e)}"
+
+    # Add the bot's answer to the history
+    st.session_state.history.append(f"Bot: {response}")
 
 # Display the conversation history
 for message in st.session_state.history:
