@@ -5,6 +5,29 @@ import streamlit as st
 from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
 import torch
 
+import json
+
+# Load the JSON data
+with open('Food menu.json', 'r') as f:
+    data = json.load(f)
+
+# Extract menu items and prices
+menu_items = []
+for category, items in data['restaurant']['menu'].items():
+    for item in items:
+        menu_items.append((item['name'], item.get('price', 'Not available')))
+
+# Print a preview of menu items (for debugging)
+print(json.dumps(menu_items[:5], indent=2))
+
+import os
+import gdown
+import zipfile
+import streamlit as st
+from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
+import torch
+import json
+
 # Define the URL for the zipped folder and paths
 model_zip_url = 'https://drive.google.com/uc?export=download&id=1-U-oNTyHSmhnXVLk4l0seTFv0j-Ir2fT'
 zip_path = 'fine-tuned-gpt2.zip'
@@ -48,6 +71,19 @@ except Exception as e:
     st.stop()
 
 st.title("Chatbot - Project 3")
+
+# Load and display menu items
+with open('Food menu.json', 'r') as f:
+    data = json.load(f)
+
+menu_items = []
+for category, items in data['restaurant']['menu'].items():
+    for item in items:
+        menu_items.append((item['name'], item.get('price', 'Not available')))
+
+st.subheader("Menu")
+for name, price in menu_items:
+    st.write(f"{name}: {price}")
 
 # Initialize session state for conversation history
 if 'history' not in st.session_state:
