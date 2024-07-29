@@ -58,24 +58,23 @@ question = st.text_input("Your question:")
 
 if question:
     # Handle greetings separately
-    if question.lower() in ["hi", "hello", "hey", 'hi.', 'hello.', 'hey.']:
+    if question.lower() in ["hi", "hello", "hey"]:
         response = "Welcome! How can I help you today?"
         st.session_state.history.append(f"Bot: {response}")
     else:
         # Add the user's question to the history
         st.session_state.history.append(f"User: {question}")
 
-        # Create prompt with current question and recent history
-        context = " ".join(st.session_state.history[-10:])  # Use recent history to avoid excessive context
-        prompt = f"{context}\nBot:"
+        # Create prompt with the most recent question
+        prompt = f"User: {question}\nBot:"
 
         # Generate the bot's response
-        result = qa_pipeline(prompt, max_length=150, num_return_sequences=1)
+        result = qa_pipeline(prompt, max_length=100, num_return_sequences=1)
         answer = result[0]['generated_text'].strip()
 
-        # Extract the response after the last 'Bot:' in the answer
+        # Extract the response after 'Bot:' in the answer
         response = answer.split("Bot:")[-1].strip()
-
+        
         # Add the bot's answer to the history
         st.session_state.history.append(f"Bot: {response}")
 
