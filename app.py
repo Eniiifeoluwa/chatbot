@@ -5,14 +5,16 @@ import streamlit as st
 from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
 import torch
 
-model_zip_url = 'https://drive.google.com/file/d/1-U-oNTyHSmhnXVLk4l0seTFv0j-Ir2fT/view?usp=drive_link'
+# Define the URL for the zipped folder and paths
+model_zip_url = 'https://drive.google.com/uc?export=download&id=1-U-oNTyHSmhnXVLk4l0seTFv0j-Ir2fT'
 zip_path = 'fine-tuned-gpt2.zip'
 model_dir = 'fine-tuned-gpt2'
 
-
+# Download the zipped folder if it hasn't been downloaded yet
 if not os.path.exists(zip_path):
     gdown.download(model_zip_url, zip_path, quiet=False)
 
+# Unzip the folder if it hasn't been unzipped yet
 if not os.path.exists(model_dir):
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(model_dir)
@@ -72,15 +74,20 @@ if question:
         answer = result[0]['generated_text'].strip()
 
         # Extract the response part from the generated text
-        # Assuming the format is "Question: ... Answer: ..."
-        if 'Answer:' in answer:
-            response = answer.split('Answer:')[-1].strip()
-        else:
-            response = answer
+        response = answer.split('Answer:')[-1].strip() if 'Answer:' in answer else answer
 
         # Add the bot's answer to the history
         st.session_state.history.append(f"Bot: {response}")
 
-# Display the conversation history
+# Display the conversation history with the correct alignment
 for message in st.session_state.history:
-    st.write(message)
+    if message.startswith("User:"):
+        with st.container():
+            col1, col2 = st.columns([1, 3])  # Adjust the column widths as needed
+            with col2:
+                st.write(message)
+    elif message.startswith("Bot:"):
+        with st.container():
+            col1, col2 = st.columns([3, 1])  # Adjust the column widths as needed
+            with col1:
+                st.write(message)
