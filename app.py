@@ -43,6 +43,7 @@ try:
     model = GPT2LMHeadModel.from_pretrained(model_dir).to(device)
     tokenizer = GPT2Tokenizer.from_pretrained(model_dir)
     qa_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0 if device == 'cuda' else -1)
+    st.write("Model and tokenizer loaded successfully.")
 except Exception as e:
     st.error(f"Error loading the model: {str(e)}")
     st.stop()
@@ -68,26 +69,29 @@ if question:
 
         # Create prompt with the most recent question
         prompt = f"Question: {question}\nAnswer:"
+        st.write(f"Generated prompt: {prompt}")
 
         # Generate the bot's response
-        result = qa_pipeline(prompt, max_length=100, num_return_sequences=1)
-        answer = result[0]['generated_text'].strip()
+        try:
+            result = qa_pipeline(prompt, max_length=100, num_return_sequences=1)
+            answer = result[0]['generated_text'].strip()
+            st.write(f"Generated answer: {answer}")
 
-        # Extract the response part from the generated text
-        response = answer.split('Answer:')[-1].strip() if 'Answer:' in answer else answer
-
-        # Add the bot's answer to the history
-        st.session_state.history.append(f"Bot: {response}")
+            # Extract the response part from the generated text
+            response = answer.split('Answer:')[-1].strip() if 'Answer:' in answer else answer
+            st.session_state.history.append(f"Bot: {response}")
+        except Exception as e:
+            st.error(f"Error generating response: {str(e)}")
 
 # Display the conversation history with the correct alignment
 for message in st.session_state.history:
     if message.startswith("User:"):
         with st.container():
-            col1, col2 = st.columns([1, 3])  # Adjust the column widths as needed
+            col1, col2 = st.columns([1, 6])  # Adjust the column widths as needed
             with col2:
                 st.write(message)
     elif message.startswith("Bot:"):
         with st.container():
-            col1, col2 = st.columns([3, 1])  # Adjust the column widths as needed
+            col1, col2 = st.columns([6, 1])  # Adjust the column widths as needed
             with col1:
                 st.write(message)
