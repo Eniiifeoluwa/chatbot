@@ -22,9 +22,9 @@ if not os.path.exists(tokenizer_dir):
 # Load the tokenizer
 tokenizer = GPT2Tokenizer.from_pretrained(tokenizer_dir)
 
-# Load the model and its state dictionary
+# Load the model
 model = GPT2LMHeadModel.from_pretrained("gpt2")
-model.load_state_dict(torch.load(model_path))
+model.load_state_dict(torch.load(model_path, map_location=device))  # Ensure correct device
 model.to(device)
 
 # Initialize the text generation pipeline
