@@ -7,13 +7,13 @@ import torch
 # Define the directory and file IDs
 model_dir = 'fine-tuned-gpt2'
 file_ids = {
-    'config.json': '1-LpqdLnsaw3fp_KQC4-TiH2Ir4Hql-eE-',
+    'config.json': '1-LpqdLnsaw3fp_KQC4-TiH2Ir4Hql-eE',
     'model.safetensors' : '1-S2AIPpo7L4k2gZKI-FMDCawKDTmj9b-',
-    'generation_config.json': '1-3zQfTXbmuxyxpenqVR80GIDTGvSY62o-',
-    'vocab.json': '1-NqPU2oIFxORmTPDiwoiamlCu6Mb59vj-',
-    'merges.txt': '1-45d87LI3k03DN0Umsc7tePl33Y0b5Wb-',
-    'tokenizer_config.json': '1-8fcX7ePKW7Hc-2r9ZKZmN6deiq4S03a-',
-    'special_tokens_map.json': '1-Sq8XlcVxfutKTbal0idqKH5qBHx1Z9a-',
+    'generation_config.json': '1-3zQfTXbmuxyxpenqVR80GIDTGvSY62o',
+    'vocab.json': '1-NqPU2oIFxORmTPDiwoiamlCu6Mb59vj',
+    'merges.txt': '1-45d87LI3k03DN0Umsc7tePl33Y0b5Wb',
+    'tokenizer_config.json': '1-8fcX7ePKW7Hc-2r9ZKZmN6deiq4S03a',
+    'special_tokens_map.json': '1-Sq8XlcVxfutKTbal0idqKH5qBHx1Z9a',
 }
 
 # Create the model directory if it doesn't exist
