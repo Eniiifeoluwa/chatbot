@@ -66,15 +66,19 @@ if question:
         st.session_state.history.append(f"User: {question}")
 
         # Create prompt with the most recent question
-        prompt = f"User: {question}\nBot:"
+        prompt = f"Question: {question}\nAnswer:"
 
         # Generate the bot's response
         result = qa_pipeline(prompt, max_length=100, num_return_sequences=1)
         answer = result[0]['generated_text'].strip()
 
-        # Extract the response after 'Bot:' in the answer
-        response = answer.split("Bot:")[-1].strip()
-        
+        # Extract the response part from the generated text
+        # Assuming the format is "Question: ... Answer: ..."
+        if 'Answer:' in answer:
+            response = answer.split('Answer:')[-1].strip()
+        else:
+            response = answer
+
         # Add the bot's answer to the history
         st.session_state.history.append(f"Bot: {response}")
 
