@@ -58,7 +58,7 @@ question = st.text_input("Your question:")
 
 if question:
     # Handle greetings separately
-    if question.lower() in ["hi", "hello", "hey"]:
+    if question.lower() in ["hi", "hello", "hey", 'hi.', 'hello.', 'hey.']:
         response = "Welcome! How can I help you today?"
         st.session_state.history.append(f"Bot: {response}")
     else:
