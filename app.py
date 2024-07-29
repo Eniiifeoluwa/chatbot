@@ -5,12 +5,13 @@ import streamlit as st
 from transformers import GPT2Tokenizer, GPT2LMHeadModel
 import torch
 
-
+# Define the Google Drive file ID
 file_id = '1-TBHbObeMZnEMu3qqL-PDUnfWLQRHQyB'
 destination = 'fine-tuned-gpt2.zip'
+model_dir = 'fine-tuned-gpt2'
 
-
-if not os.path.exists('fine-tuned-gpt2'):
+# Download the model zip file if it doesn't exist
+if not os.path.exists(model_dir):
     if not os.path.exists(destination):
         gdown.download(f'https://drive.google.com/uc?export=download&id={file_id}', destination, quiet=False)
     
@@ -18,12 +19,24 @@ if not os.path.exists('fine-tuned-gpt2'):
     with zipfile.ZipFile(destination, 'r') as zip_ref:
         zip_ref.extractall('.')
 
+# Verify the model directory and files
+expected_files = ['config.json', 'pytorch_model.bin', 'vocab.json', 'merges.txt', 'tokenizer_config.json', 'special_tokens_map.json']
+missing_files = [ef for ef in expected_files if not os.path.exists(os.path.join(model_dir, ef))]
 
+if missing_files:
+    st.error(f"Error: The following files are missing in {model_dir}: {', '.join(missing_files)}")
+    st.stop()
+
+# Check if GPU is available
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Load the fine-tuned model and tokenizer
-model = GPT2LMHeadModel.from_pretrained("./fine-tuned-gpt2").to(device)
-tokenizer = GPT2Tokenizer.from_pretrained("./fine-tuned-gpt2")
+try:
+    model = GPT2LMHeadModel.from_pretrained(model_dir).to(device)
+    tokenizer = GPT2Tokenizer.from_pretrained(model_dir)
+except Exception as e:
+    st.error(f"Error loading the model: {str(e)}")
+    st.stop()
 
 st.title("Restaurant Chatbot")
 
