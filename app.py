@@ -25,7 +25,7 @@ download_model(model_url, zip_filename)
 
 # Load the model and tokenizer
 model_name = "fine-tuned-gpt2"
-if not os.path.exists("fine-tuned-gpt2"):
+if not os.path.exists(model_name):
     st.write(f"Model directory {model_name} does not exist. Please check the download and unzip process.")
 else:
     tokenizer = GPT2Tokenizer.from_pretrained(model_name)
@@ -35,9 +35,16 @@ else:
     qa_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
     def generate_answer(question):
+        # Special case for greeting
+        if question.lower() in ["hi", "hello", "hey"]:
+            return "Hello! How can I assist you today? Feel free to ask about our menu or services."
+        
         prompt = f"Question: {question}\nAnswer:"
         result = qa_pipeline(prompt, max_length=50, num_return_sequences=1)
-        return result[0]['generated_text'].strip()
+        # Extract just the answer from the generated text
+        answer = result[0]['generated_text'].strip()
+        # Remove the prompt from the answer to prevent repeating
+        return answer.replace(prompt, "").strip()
 
     # Streamlit app interface
     st.title("Project-3 Chat GPT")
