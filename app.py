@@ -1,33 +1,34 @@
 import os
 import gdown
+import zipfile
 import streamlit as st
 from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
 import torch
 
-# Define the directory and file IDs
+# Define the URL for the zipped folder and paths
+model_zip_url = 'https://drive.google.com/uc?export=download&id=1-TBHbObeMZnEMu3qqL-PDUnfWLQRHQyB'
+zip_path = 'fine-tuned-gpt2.zip'
 model_dir = 'fine-tuned-gpt2'
-file_ids = {
-    'config.json': '1-LpqdLnsaw3fp_KQC4-TiH2Ir4Hql-eE',
-    'model.safetensors': '1-S2AIPpo7L4k2gZKI-FMDCawKDTmj9b-',
-    'generation_config.json': '1-3zQfTXbmuxyxpenqVR80GIDTGvSY62o',
-    'vocab.json': '1-NqPU2oIFxORmTPDiwoiamlCu6Mb59vj',
-    'merges.txt': '1-45d87LI3k03DN0Umsc7tePl33Y0b5Wb',
-    'tokenizer_config.json': '1-8fcX7ePKW7Hc-2r9ZKZmN6deiq4S03a',
-    'special_tokens_map.json': '1-Sq8XlcVxfutKTbal0idqKH5qBHx1Z9a',
-}
 
-# Create the model directory if it doesn't exist
+# Download the zipped folder if it hasn't been downloaded yet
+if not os.path.exists(zip_path):
+    gdown.download(model_zip_url, zip_path, quiet=False)
+
+# Unzip the folder if it hasn't been unzipped yet
 if not os.path.exists(model_dir):
-    os.makedirs(model_dir)
-
-# Download each file
-for filename, file_id in file_ids.items():
-    file_path = os.path.join(model_dir, filename)
-    if not os.path.exists(file_path):
-        gdown.download(f'https://drive.google.com/uc?export=download&id={file_id}', file_path, quiet=False)
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(model_dir)
 
 # Check if required files are present
-expected_files = file_ids.keys()
+expected_files = {
+    'config.json',
+    'model.safetensors',
+    'generation_config.json',
+    'vocab.json',
+    'merges.txt',
+    'tokenizer_config.json',
+    'special_tokens_map.json'
+}
 missing_files = [ef for ef in expected_files if not os.path.exists(os.path.join(model_dir, ef))]
 
 if missing_files:
