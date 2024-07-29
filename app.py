@@ -17,7 +17,7 @@ def download_model(model_url, zip_filename):
         st.write("Model already downloaded and unzipped.")
 
 # Define model URL and file names
-model_url = "https://drive.google.com/file/d/1FvoMtwUdvRIq-65sys7YuW51uo8lQE3H/view?usp=sharing"  # Replace with your actual file ID
+model_url = "https://drive.google.com/uc?id=1FvoMtwUdvRIq-65sys7YuW51uo8lQE3H"  # Replace with your actual file ID
 zip_filename = "fine-tuned-gpt2.zip"
 
 # Download and unzip the model
