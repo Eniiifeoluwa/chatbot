@@ -91,6 +91,6 @@ for message in st.session_state.history:
                 st.write(message)
     elif message.startswith("Bot:"):
         with st.container():
-            col1, col2 = st.columns([3, 1])  # Adjust the column widths as needed
+            col1, col2 = st.columns([6, 1])  # Adjust the column widths as needed
             with col1:
                 st.write(message)
