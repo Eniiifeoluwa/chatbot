@@ -4,28 +4,6 @@ import zipfile
 import streamlit as st
 from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
 import torch
-
-import json
-
-# Load the JSON data
-with open('Food menu.json', 'r') as f:
-    data = json.load(f)
-
-# Extract menu items and prices
-menu_items = []
-for category, items in data['restaurant']['menu'].items():
-    for item in items:
-        menu_items.append((item['name'], item.get('price', 'Not available')))
-
-# Print a preview of menu items (for debugging)
-print(json.dumps(menu_items[:5], indent=2))
-
-import os
-import gdown
-import zipfile
-import streamlit as st
-from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
-import torch
 import json
 
 # Define the URL for the zipped folder and paths
@@ -72,18 +50,25 @@ except Exception as e:
 
 st.title("Chatbot - Project 3")
 
-# Load and display menu items
-with open('Food menu.json', 'r') as f:
-    data = json.load(f)
+# File uploader for JSON file
+uploaded_file = st.file_uploader("Upload Food menu JSON file", type="json")
 
-menu_items = []
-for category, items in data['restaurant']['menu'].items():
-    for item in items:
-        menu_items.append((item['name'], item.get('price', 'Not available')))
+if uploaded_file:
+    try:
+        data = json.load(uploaded_file)
 
-st.subheader("Menu")
-for name, price in menu_items:
-    st.write(f"{name}: {price}")
+        # Extract menu items and prices
+        menu_items = {}
+        for category, items in data['restaurant']['menu'].items():
+            for item in items:
+                menu_items[item['name'].lower()] = item.get('description', 'Description not available')
+
+        st.subheader("Menu")
+        for name, description in menu_items.items():
+            st.write(f"{name.capitalize()}: {description}")
+
+    except Exception as e:
+        st.error(f"Error processing the JSON file: {str(e)}")
 
 # Initialize session state for conversation history
 if 'history' not in st.session_state:
