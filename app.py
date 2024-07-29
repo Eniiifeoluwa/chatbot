@@ -40,7 +40,7 @@ else:
             return "Hello! How can I assist you today? Feel free to ask about our menu or services."
         
         prompt = f"Question: {question}\nAnswer:"
-        result = qa_pipeline(prompt, max_length=50, num_return_sequences=1)
+        result = qa_pipeline(prompt, max_length=25, num_return_sequences=1)
         # Extract just the answer from the generated text
         answer = result[0]['generated_text'].strip()
         # Remove the prompt from the answer to prevent repeating
