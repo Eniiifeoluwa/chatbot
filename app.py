@@ -14,7 +14,7 @@ def download_model(model_url, zip_filename):
         os.system(f"unzip {zip_filename} -d fine-tuned-gpt2")
         st.write("Unzip complete.")
     else:
-        #st.write("Model already downloaded and unzipped.")
+        st.write("Model available to use")
 
 # Define model URL and file names
 model_url = "https://drive.google.com/uc?id=1FvoMtwUdvRIq-65sys7YuW51uo8lQE3H"  # Replace with your actual file ID
