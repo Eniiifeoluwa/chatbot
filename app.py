@@ -1,107 +1,56 @@
-import os
-import gdown
-import zipfile
 import streamlit as st
-from transformers import pipeline, GPT2Tokenizer, GPT2LMHeadModel
-import torch
-import json
+import gdown
+import os
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, pipeline
 
-# Define the URL for the zipped folder and paths
-model_zip_url = 'https://drive.google.com/uc?export=download&id=1-U-oNTyHSmhnXVLk4l0seTFv0j-Ir2fT'
-zip_path = 'fine-tuned-gpt2.zip'
-model_dir = 'fine-tuned-gpt2'
+# Function to download and unzip model
+def download_model(model_url, zip_filename):
+    if not os.path.exists(zip_filename):
+        st.write("Downloading model...")
+        gdown.download(model_url, zip_filename, quiet=False)
+        st.write("Download complete.")
+        
+        st.write("Unzipping model...")
+        os.system(f"unzip {zip_filename} -d fine-tuned-gpt2")
+        st.write("Unzip complete.")
+    else:
+        st.write("Model already downloaded and unzipped.")
 
-# Download the zipped folder if it hasn't been downloaded yet
-if not os.path.exists(zip_path):
-    gdown.download(model_zip_url, zip_path, quiet=False)
+# Define model URL and file names
+model_url = "https://drive.google.com/file/d/1FvoMtwUdvRIq-65sys7YuW51uo8lQE3H/view?usp=sharing"  # Replace with your actual file ID
+zip_filename = "fine-tuned-gpt2.zip"
 
-# Unzip the folder if it hasn't been unzipped yet
-if not os.path.exists(model_dir):
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(model_dir)
+# Download and unzip the model
+download_model(model_url, zip_filename)
 
-# Check if required files are present
-expected_files = {
-    'config.json',
-    'model.safetensors',
-    'generation_config.json',
-    'vocab.json',
-    'merges.txt',
-    'tokenizer_config.json',
-    'special_tokens_map.json'
-}
-missing_files = [ef for ef in expected_files if not os.path.exists(os.path.join(model_dir, ef))]
+# Load the model and tokenizer
+model_name = "fine-tuned-gpt2"
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+model = GPT2LMHeadModel.from_pretrained(model_name)
 
-if missing_files:
-    st.error(f"Error: The following files are missing in {model_dir}: {', '.join(missing_files)}")
-    st.stop()
+# Create the QA pipeline
+qa_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-# Check if GPU is available
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+def generate_answer(question):
+    prompt = f"Question: {question}\nAnswer:"
+    result = qa_pipeline(prompt, max_length=50, num_return_sequences=1)
+    return result[0]['generated_text']
 
-# Load the fine-tuned model and tokenizer
-try:
-    model = GPT2LMHeadModel.from_pretrained(model_dir).to(device)
-    tokenizer = GPT2Tokenizer.from_pretrained(model_dir)
-    qa_pipeline = pipeline("text-generation", model=model, tokenizer=tokenizer, device=0 if device == 'cuda' else -1)
-except Exception as e:
-    st.error(f"Error loading the model: {str(e)}")
-    st.stop()
+# Streamlit app interface
+st.title("Project-3 Chat GPT")
 
-st.title("Chatbot - Project 3")
-
-# File uploader for JSON file
-uploaded_file = st.file_uploader("Upload Food menu JSON file", type="json")
-
-menu_items = {}
-
-if uploaded_file:
-    try:
-        data = json.load(uploaded_file)
-        for category, items in data['restaurant']['menu'].items():
-            for item in items:
-                menu_items[item['name'].lower()] = item.get('description', 'Description not available')
-
-        st.subheader("Menu")
-        for name, description in menu_items.items():
-            st.write(f"{name.capitalize()}: {description}")
-
-    except Exception as e:
-        st.error(f"Error processing the JSON file: {str(e)}")
-
-# Initialize session state for conversation history
+# Initialize session state
 if 'history' not in st.session_state:
     st.session_state.history = []
 
-st.write("Ask me anything about our restaurant!")
-
-question = st.text_input("Your question:")
+# Input section
+question = st.text_input("Ask a question about the restaurant:")
 
 if question:
-    # Add the user's question to the history
-    st.session_state.history.append(f"User: {question}")
-
-    # Check if the question is about a specific menu item
-    lower_question = question.lower().strip()
-    if lower_question in menu_items:
-        response = menu_items[lower_question]
-    else:
-        # Create prompt with the most recent question
-        prompt = f"Question: {question}\nAnswer:"
-
-        # Generate the bot's response
-        try:
-            result = qa_pipeline(prompt, max_length=150, num_return_sequences=1)
-            answer = result[0]['generated_text'].strip()
-
-            # Extract the answer part from the generated text
-            response = answer.split('Answer:')[-1].strip()
-        except Exception as e:
-            response = f"Error generating response: {str(e)}"
-
-    # Add the bot's answer to the history
-    st.session_state.history.append(f"Bot: {response}")
-
-# Display the conversation history
-for message in st.session_state.history:
-    st.write(message)
+    answer = generate_answer(question)
+    st.session_state.history.append((question, answer))
+    
+# Display history
+for q, a in st.session_state.history:
+    st.write(f"**Question:** {q}")
+    st.write(f"**Answer:** {a}")
