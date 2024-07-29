@@ -25,7 +25,7 @@ download_model(model_url, zip_filename)
 
 # Load the model and tokenizer
 model_name = "fine-tuned-gpt2"
-if not os.path.exists(fine-tuned-gpt2"):
+if not os.path.exists("fine-tuned-gpt2"):
     st.write(f"Model directory {model_name} does not exist. Please check the download and unzip process.")
 else:
     tokenizer = GPT2Tokenizer.from_pretrained(model_name)
