@@ -62,7 +62,7 @@ if question:
     # Generate the bot's response
     prompt = f"Question: {question}\nAnswer:"
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
-    outputs = model.generate(inputs["input_ids"], max_length=100, num_return_sequences=1)
+    outputs = model.generate(inputs["input_ids"], max_length=50, num_return_sequences=1)
     answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
     answer = answer.replace(prompt, "").strip()
     
